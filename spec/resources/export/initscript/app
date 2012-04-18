@@ -18,7 +18,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Runs app"
 NAME=app
-PIDFILE=/var/run/$NAME.pid
+PIDDIR=/var/run/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Read configuration variable file if it is present
@@ -52,14 +52,14 @@ do_start()
 }
 
 ### START EACH PROCESS
-		do_start_alpha_1()
-		{
-			# This starts the process
-		}
-		do_start_bravo_1()
-		{
-			# This starts the process
-		}
+do_start_alpha_1()
+{
+	# This starts the process
+}
+do_start_bravo_1()
+{
+	# This starts the process
+}
 ###
 
 #
