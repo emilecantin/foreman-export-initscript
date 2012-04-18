@@ -44,16 +44,14 @@ do_start()
 		
 			# START CONCURRENT: 1
 				# Start: app.alpha.1
-				exec su - app -c 'cd /tmp/app; export PORT=5000; ./alpha >> /var/log/app/alpha-1.log 2>&1 &'
 				# Create $PIDDIR/alpha.1.pid
-				echo $! > $PIDDIR/alpha.1.pid
+				exec su - app -c 'cd /tmp/app; export PORT=5000; ./alpha >> /var/log/app/alpha-1.log 2>&1 & echo $!' > $PIDDIR/alpha.1.pid
 		
 	
 			# START CONCURRENT: 2
 				# Start: app.alpha.2
-				exec su - app -c 'cd /tmp/app; export PORT=5001; ./alpha >> /var/log/app/alpha-2.log 2>&1 &'
 				# Create $PIDDIR/alpha.2.pid
-				echo $! > $PIDDIR/alpha.2.pid
+				exec su - app -c 'cd /tmp/app; export PORT=5001; ./alpha >> /var/log/app/alpha-2.log 2>&1 & echo $!' > $PIDDIR/alpha.2.pid
 		
 
 		# START PROCESS: bravo
