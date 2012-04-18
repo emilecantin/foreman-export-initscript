@@ -1,0 +1,2 @@
+require "foreman/export/initscript"
+
