@@ -18,7 +18,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Runs app"
 NAME=app
-PIDFILE=/var/run/$NAME.pid
+PIDDIR=/var/run/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Read configuration variable file if it is present
@@ -37,67 +37,52 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_start()
 {
-	# Return
-	#   0 if daemon has been started
-	#   1 if daemon was already running
-	#   2 if daemon could not be started
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
-	# Add code here, if necessary, that waits for the process to be ready
-	# to handle requests from services started subsequently which depend
-	# on this one.  As a last resort, sleep for some time.
-}
+	mkdir -p $PIDDIR
+	# START APPLICATION: app
+	
+		# START PROCESS: alpha
+		
+			# START CONCURRENT: 1
+				# Start: app.alpha.1
+				exec su - app -c 'cd /tmp/app; export PORT=5000; ./alpha >> /var/log/app/alpha-1.log 2>&1 &'
+				# Create $PIDDIR/alpha.1.pid
+				echo $! > $PIDDIR/alpha.1.pid
+		
+	
+			# START CONCURRENT: 2
+				# Start: app.alpha.2
+				exec su - app -c 'cd /tmp/app; export PORT=5001; ./alpha >> /var/log/app/alpha-2.log 2>&1 &'
+				# Create $PIDDIR/alpha.2.pid
+				echo $! > $PIDDIR/alpha.2.pid
+		
 
-### START EACH PROCESS
-		do_start_alpha_1()
-		{
-			# This starts the process
-		}
-		do_start_alpha_2()
-		{
-			# This starts the process
-		}
-###
+		# START PROCESS: bravo
+
+}
 
 #
 # Function that stops the daemon/service
 #
 do_stop()
 {
-	# Return
-	#   0 if daemon has been stopped
-	#   1 if daemon was already stopped
-	#   2 if daemon could not be stopped
-	#   other if a failure occurred
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
-	RETVAL="$?"
-	[ "$RETVAL" = 2 ] && return 2
-	# Wait for children to finish too if this is a daemon that forks
-	# and if the daemon is only ever run from this initscript.
-	# If the above conditions are not satisfied then add some other code
-	# that waits for the process to drop all resources that could be
-	# needed by services started subsequently.  A last resort is to
-	# sleep for some time.
-	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
-	[ "$?" = 2 ] && return 2
-	# Many daemons don't delete their pidfiles when they exit.
-	rm -f $PIDFILE
-	return "$RETVAL"
-}
+	# STOP APPLICATION: app
+	
+		# STOP PROCESS: alpha
+		
+			# STOP CONCURRENT: 1
+				# Stop: app.alpha.1
+				kill `echo $PIDDIR/alpha.1.pid`
+		
+	
+			# STOP CONCURRENT: 2
+				# Stop: app.alpha.2
+				kill `echo $PIDDIR/alpha.2.pid`
+		
+	
+		# STOP PROCESS: bravo
 
-### STOP EACH PROCESS
-		do_stop_alpha_1()
-		{
-			# This starts the process
-		}
-		do_stop_alpha_2()
-		{
-			# This starts the process
-		}
-###
+	rmdir $PIDDIR
+}
 
 case "$1" in
   start)
