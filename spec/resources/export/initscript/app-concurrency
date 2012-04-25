@@ -19,7 +19,9 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Runs app"
 NAME=app
 PIDDIR=/var/run/$NAME
+LOGDIR=/var/log/app
 SCRIPTNAME=/etc/init.d/$NAME
+USERNAME=app
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
@@ -38,6 +40,8 @@ SCRIPTNAME=/etc/init.d/$NAME
 do_start()
 {
 	mkdir -p $PIDDIR
+	mkdir -p $LOGDIR
+	chown $USERNAME: $LOGDIR
 	# START APPLICATION: app
 	
 		# START PROCESS: alpha
@@ -45,13 +49,13 @@ do_start()
 			# START CONCURRENT: 1
 				# Start: app.alpha.1
 				# Create $PIDDIR/alpha.1.pid
-				exec su - app -c 'cd /tmp/app; export PORT=5000; ./alpha >> /var/log/app/alpha-1.log 2>&1 & echo $!' > $PIDDIR/alpha.1.pid
+				su - $USERNAME -c 'cd /tmp/app; export PORT=5000; ./alpha >> $LOGDIR/alpha-1.log 2>&1 & echo $!' > $PIDDIR/alpha.1.pid
 		
 	
 			# START CONCURRENT: 2
 				# Start: app.alpha.2
 				# Create $PIDDIR/alpha.2.pid
-				exec su - app -c 'cd /tmp/app; export PORT=5001; ./alpha >> /var/log/app/alpha-2.log 2>&1 & echo $!' > $PIDDIR/alpha.2.pid
+				su - $USERNAME -c 'cd /tmp/app; export PORT=5001; ./alpha >> $LOGDIR/alpha-2.log 2>&1 & echo $!' > $PIDDIR/alpha.2.pid
 		
 
 		# START PROCESS: bravo
@@ -69,12 +73,14 @@ do_stop()
 		
 			# STOP CONCURRENT: 1
 				# Stop: app.alpha.1
-				kill `echo $PIDDIR/alpha.1.pid`
+				kill `cat $PIDDIR/alpha.1.pid`
+				rm $PIDDIR/alpha.1.pid
 		
 	
 			# STOP CONCURRENT: 2
 				# Stop: app.alpha.2
-				kill `echo $PIDDIR/alpha.2.pid`
+				kill `cat $PIDDIR/alpha.2.pid`
+				rm $PIDDIR/alpha.2.pid
 		
 	
 		# STOP PROCESS: bravo

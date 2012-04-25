@@ -19,7 +19,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Runs <%= app %>"
 NAME=<%= app %>
 PIDDIR=/var/run/$NAME
-LOGDIR=/var/log/$NAME
+LOGDIR=<%= log_root %>
 SCRIPTNAME=/etc/init.d/$NAME
 USERNAME=<%= user %>
 
@@ -49,7 +49,7 @@ do_start()
 			# START CONCURRENT: <%= num %>
 				# Start: <%= app %>.<%= process.name %>.<%= num %>
 				# Create $PIDDIR/<%= process.name %>.<%= num %>.pid
-				exec su - USERNAME -c 'cd <%= engine.directory %>; export PORT=<%= engine.port_for(process, num, self.port) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log_root %>/<%=process.name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= process.name %>.<%= num %>.pid
+				su - $USERNAME -c 'cd <%= engine.directory %>; export PORT=<%= engine.port_for(process, num, self.port) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> $LOGDIR/<%=process.name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= process.name %>.<%= num %>.pid
 		<% end %>
 	<% end %>
 
@@ -66,7 +66,8 @@ do_stop()
 		<% 1.upto(concurrency[process.name]) do |num| %>
 			# STOP CONCURRENT: <%= num %>
 				# Stop: <%= app %>.<%= process.name %>.<%= num %>
-				kill `echo $PIDDIR/<%= process.name %>.<%= num %>.pid`
+				kill `cat $PIDDIR/<%= process.name %>.<%= num %>.pid`
+				rm $PIDDIR/<%= process.name %>.<%= num %>.pid
 		<% end %>
 	<% end %>
 	rmdir $PIDDIR
