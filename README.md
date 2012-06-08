@@ -3,7 +3,7 @@
 ### Using in your application
 
 ```ruby
-gem 'foreman-export-initscript', :git => 'git://github.com/emilecantin/foreman-export-initscript.git'
+gem 'foreman-export-initscript', :git => 'git://github.com/lzgo/foreman-export-initscript.git'
 ```
 
 then `bundle exec foreman export initscript /etc/init.d`
