@@ -5,8 +5,9 @@ require "tmpdir"
 
 describe Foreman::Export::Initscript, :fakefs do
   let(:procfile) { FileUtils.mkdir_p("/tmp/app"); write_procfile("/tmp/app/Procfile") }
-  let(:engine)   { Foreman::Engine.new(procfile) }
-  let(:options)  { Hash.new }
+  let(:formation) { nil }
+  let(:engine)    { Foreman::Engine.new(:formation => formation).load_procfile(procfile) }
+  let(:options)   { Hash.new }
   let(:initscript) { Foreman::Export::Initscript.new("/tmp/init", engine, options) }
 
   before(:each) { load_export_templates_into_fakefs("initscript") }
