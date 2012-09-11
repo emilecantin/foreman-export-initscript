@@ -42,13 +42,13 @@ do_start()
 	mkdir -p <%= log %>
 	chown $USERNAME: <%= log %>
 	# START APPLICATION: <%= app %>
-	<% engine.procfile.entries.each do |process| %>
-		# START PROCESS: <%= process.name %>
-		<% 1.upto(concurrency[process.name]) do |num| %>
+	<% engine.each_process do |name, process| %>
+		# START PROCESS: <%= name %>
+		<% 1.upto(engine.formation[name]) do |num| %>
 			# START CONCURRENT: <%= num %>
-				# Start: <%= app %>.<%= process.name %>.<%= num %>
-				# Create $PIDDIR/<%= process.name %>.<%= num %>.pid
-				su - $USERNAME -c 'cd <%= engine.directory %>; export PORT=<%= engine.port_for(process, num, self.port) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log %>/<%=process.name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= process.name %>.<%= num %>.pid
+				# Start: <%= app %>.<%= name %>.<%= num %>
+				# Create $PIDDIR/<%= name %>.<%= num %>.pid
+				su - $USERNAME -c 'cd <%= engine.root %>; export PORT=<%= engine.port_for(process, num) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log %>/<%=name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= name %>.<%= num %>.pid
 		<% end %>
 	<% end %>
 
@@ -60,13 +60,13 @@ do_start()
 do_stop()
 {
 	# STOP APPLICATION: <%= app %>
-	<% engine.procfile.entries.each do |process| %>
-		# STOP PROCESS: <%= process.name %>
-		<% 1.upto(concurrency[process.name]) do |num| %>
+	<% engine.each_process do |name, process| %>
+		# STOP PROCESS: <%= name %>
+		<% 1.upto(engine.formation[name]) do |num| %>
 			# STOP CONCURRENT: <%= num %>
-				# Stop: <%= app %>.<%= process.name %>.<%= num %>
-				kill `cat $PIDDIR/<%= process.name %>.<%= num %>.pid`
-				rm $PIDDIR/<%= process.name %>.<%= num %>.pid
+				# Stop: <%= app %>.<%= name %>.<%= num %>
+				kill `cat $PIDDIR/<%= name %>.<%= num %>.pid`
+				rm $PIDDIR/<%= name %>.<%= num %>.pid
 		<% end %>
 	<% end %>
 	rmdir $PIDDIR

@@ -8,7 +8,7 @@ describe Foreman::Export::Initscript, :fakefs do
   let(:formation) { nil }
   let(:engine)    { Foreman::Engine.new(:formation => formation).load_procfile(procfile) }
   let(:options)   { Hash.new }
-  let(:initscript) { Foreman::Export::Initscript.new("/tmp/init", engine, options) }
+  let(:initscript) { FileUtils.mkdir_p("/tmp/init"); Foreman::Export::Initscript.new("/tmp/init", engine, options) }
 
   before(:each) { load_export_templates_into_fakefs("initscript") }
   before(:each) { stub(initscript).say }
@@ -17,14 +17,6 @@ describe Foreman::Export::Initscript, :fakefs do
     initscript.export
     normalize_space(File.read("/tmp/init/app")).should == normalize_space(example_export_file("initscript/app"))
   end
-
-#  it "cleans up if exporting into an existing dir" do
-#    mock(FileUtils).rm("/tmp/init/app")
-#
-#    initscript.export
-#    #require 'debug'
-#    initscript.export
-#  end
 
   context  "with concurrency" do
     let(:options) { Hash[:concurrency => "alpha=2"] }
