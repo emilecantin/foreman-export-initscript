@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "foreman-export-initscript"
-  s.version     = "0.0.1"
+  s.version     = "0.0.2"
   s.authors     = ["Emile Cantin"]
   s.email       = ["emile.cantin@gmail.com"]
   s.homepage    = ""
