@@ -24,7 +24,7 @@ class Foreman::Export::Initscript < Foreman::Export::Base
     path = File.read(matchers.detect { |m| File.exists?(m) })
     compiled = ERB.new(path).result(binding)
     write_file "#{app}", compiled
-    FileUtils.chmod(755, "#{File.join location, app}")
+    FileUtils.chmod(0755, "#{File.join location, app}")
 #    path = export_template name
 #    write_template "initscript/master.erb", "#{app}", binding
    end
