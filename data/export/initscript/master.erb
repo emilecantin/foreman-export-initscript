@@ -18,7 +18,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Runs <%= app %>"
 NAME=<%= app %>
-PIDDIR=/var/run/$NAME
+PIDDIR=<%= run %>/pid/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 USERNAME=<%= user %>
 

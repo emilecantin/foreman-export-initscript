@@ -5,10 +5,10 @@ class Foreman::Export::Initscript < Foreman::Export::Base
 
   def export
 
-    #super
-    error("Must specify a location") unless location
-    FileUtils.mkdir_p(location) rescue error("Could not create: #{location}")
-    FileUtils.mkdir_p(log) rescue error("Could not create: #{log}")
+    super
+#    error("Must specify a location") unless location
+#    FileUtils.mkdir_p(location) rescue error("Could not create: #{location}")
+#    FileUtils.mkdir_p(log) rescue error("Could not create: #{log}")
 #    begin
 #      FileUtils.chown(user, nil, log)
 #    rescue Exception => e
