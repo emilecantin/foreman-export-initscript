@@ -5,10 +5,10 @@ class Foreman::Export::Initscript < Foreman::Export::Base
 
   def export
 
-    #super
-    error("Must specify a location") unless location
-    FileUtils.mkdir_p(location) rescue error("Could not create: #{location}")
-    FileUtils.mkdir_p(log) rescue error("Could not create: #{log}")
+    super
+#    error("Must specify a location") unless location
+#    FileUtils.mkdir_p(location) rescue error("Could not create: #{location}")
+#    FileUtils.mkdir_p(log) rescue error("Could not create: #{log}")
 #    begin
 #      FileUtils.chown(user, nil, log)
 #    rescue Exception => e
@@ -24,7 +24,7 @@ class Foreman::Export::Initscript < Foreman::Export::Base
     path = File.read(matchers.detect { |m| File.exists?(m) })
     compiled = ERB.new(path).result(binding)
     write_file "#{app}", compiled
-    FileUtils.chmod(755, "#{app}")
+    FileUtils.chmod(0755, "#{File.join location, app}")
 #    path = export_template name
 #    write_template "initscript/master.erb", "#{app}", binding
    end

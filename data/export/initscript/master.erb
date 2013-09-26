@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 ### BEGIN INIT INFO
 # Provides:          <%= app %>
 # Required-Start:    $remote_fs $syslog
@@ -18,7 +18,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Runs <%= app %>"
 NAME=<%= app %>
-PIDDIR=/var/run/$NAME
+PIDDIR=<%= run %>/pid/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 USERNAME=<%= user %>
 
@@ -48,8 +48,14 @@ do_start()
 			# START CONCURRENT: <%= num %>
 				# Start: <%= app %>.<%= name %>.<%= num %>
 				# Create $PIDDIR/<%= name %>.<%= num %>.pid
-				su - $USERNAME -c 'cd <%= engine.root %>; export PORT=<%= engine.port_for(process, num) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log %>/<%=name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= name %>.<%= num %>.pid
-		<% end %>
+				if [ "$UID" -eq 0 ]; then
+					su - $USERNAME -c 'cd <%= engine.root %>; export PORT=<%= engine.port_for(process, num) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log %>/<%=name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= name %>.<%= num %>.pid
+					chown -R $USERNAME $PIDDIR
+					chown -R $USERNAME <%= log %>
+				else
+					cd <%= engine.root %>; export PORT=<%= engine.port_for(process, num) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log %>/<%=name%>-<%=num%>.log 2>&1 & echo $! > $PIDDIR/<%= name %>.<%= num %>.pid
+				fi
+			<% end %>
 	<% end %>
 
 }
