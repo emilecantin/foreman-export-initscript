@@ -48,7 +48,7 @@ do_start()
 			# START CONCURRENT: <%= num %>
 				# Start: <%= app %>.<%= name %>.<%= num %>
 				# Create $PIDDIR/<%= name %>.<%= num %>.pid
-				su - $USERNAME -c 'cd <%= engine.root %>; export PORT=<%= engine.port_for(process, num) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>=<%= env %>; <% end %> <%= process.command %> >> <%= log %>/<%=name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= name %>.<%= num %>.pid
+				su - $USERNAME -c 'cd <%= engine.root %>; export PORT=<%= engine.port_for(process, num) %>;<% engine.environment.each_pair do |var,env| %> export <%= var.upcase %>='<%= env %>'; <% end %> <%= process.command %> >> <%= log %>/<%=name%>-<%=num%>.log 2>&1 & echo $!' > $PIDDIR/<%= name %>.<%= num %>.pid
 		<% end %>
 	<% end %>
 
